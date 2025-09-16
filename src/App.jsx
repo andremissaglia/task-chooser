@@ -60,6 +60,36 @@ function App() {
     }
   };
 
+  const renameSection = (oldName, newName) => {
+    const trimmedNewName = newName.trim();
+    if (!trimmedNewName || trimmedNewName === oldName) {
+      return;
+    }
+
+    // Check if new name already exists
+    if (sections.includes(trimmedNewName)) {
+      return;
+    }
+
+    // Update sections array
+    setSections((prev) =>
+      prev.map((section) => (section === oldName ? trimmedNewName : section))
+    );
+
+    // Update tasks object
+    setTasks((prev) => {
+      const newTasks = { ...prev };
+      newTasks[trimmedNewName] = newTasks[oldName];
+      delete newTasks[oldName];
+      return newTasks;
+    });
+
+    // Update picked task if it was from the renamed section
+    if (pickedTask && pickedTask.section === oldName) {
+      setPickedTask((prev) => ({ ...prev, section: trimmedNewName }));
+    }
+  };
+
   const addTask = (section, text) => {
     const newTask = {
       id: Date.now(),
@@ -217,6 +247,9 @@ function App() {
             onToggleUrgent={(taskId) => toggleUrgent(section, taskId)}
             onRemoveTask={(taskId) => removeTask(section, taskId)}
             onRemoveSection={() => removeSection(section)}
+            onRenameSection={(oldName, newName) =>
+              renameSection(oldName, newName)
+            }
             canRemove={sections.length > 1}
           />
         ))}

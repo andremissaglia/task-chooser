@@ -22,6 +22,38 @@
   font-weight: 600;
 }
 
+.section-title {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.section-title:hover {
+  background-color: #f1f5f9;
+}
+
+.title-edit-form {
+  margin: 0;
+}
+
+.title-edit-input {
+  background: #f8fafc;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  outline: none;
+  min-width: 150px;
+  font-family: inherit;
+}
+
 .section-header-controls {
   display: flex;
   align-items: center;

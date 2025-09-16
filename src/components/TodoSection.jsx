@@ -1,34 +1,83 @@
-import { useState } from 'react'
-import TodoItem from './TodoItem'
-import './TodoSection.css'
+import { useState } from "react";
+import TodoItem from "./TodoItem";
+import "./TodoSection.css";
 
-const TodoSection = ({ 
-  title, 
-  tasks, 
-  onAddTask, 
-  onToggleTask, 
-  onToggleUrgent, 
+const TodoSection = ({
+  title,
+  tasks,
+  onAddTask,
+  onToggleTask,
+  onToggleUrgent,
   onRemoveTask,
   onRemoveSection,
-  canRemove
+  onRenameSection,
+  canRemove,
 }) => {
-  const [newTaskText, setNewTaskText] = useState('')
+  const [newTaskText, setNewTaskText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(title);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newTaskText.trim()) {
-      onAddTask(newTaskText)
-      setNewTaskText('')
+      onAddTask(newTaskText);
+      setNewTaskText("");
     }
-  }
+  };
 
-  const completedCount = tasks.filter(task => task.completed).length
-  const totalCount = tasks.length
+  const handleTitleClick = () => {
+    setIsEditing(true);
+    setEditingTitle(title);
+  };
+
+  const handleTitleSubmit = (e) => {
+    e.preventDefault();
+    const trimmedTitle = editingTitle.trim();
+    if (trimmedTitle && trimmedTitle !== title) {
+      onRenameSection(title, trimmedTitle);
+    }
+    setIsEditing(false);
+  };
+
+  const handleTitleCancel = () => {
+    setEditingTitle(title);
+    setIsEditing(false);
+  };
+
+  const handleTitleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      handleTitleCancel();
+    }
+  };
+
+  const completedCount = tasks.filter((task) => task.completed).length;
+  const totalCount = tasks.length;
 
   return (
     <section className="todo-section">
       <div className="section-header">
-        <h2>{title}</h2>
+        {isEditing ? (
+          <form onSubmit={handleTitleSubmit} className="title-edit-form">
+            <input
+              type="text"
+              value={editingTitle}
+              onChange={(e) => setEditingTitle(e.target.value)}
+              onBlur={handleTitleSubmit}
+              onKeyDown={handleTitleKeyDown}
+              className="title-edit-input"
+              autoFocus
+              maxLength={50}
+            />
+          </form>
+        ) : (
+          <h2
+            className="section-title"
+            onClick={handleTitleClick}
+            title="Click to rename section"
+          >
+            {title}
+          </h2>
+        )}
         <div className="section-header-controls">
           <span className="task-count">
             {completedCount}/{totalCount}
@@ -44,7 +93,7 @@ const TodoSection = ({
           )}
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="add-task-form">
         <input
           type="text"
@@ -53,11 +102,13 @@ const TodoSection = ({
           placeholder="Add new task..."
           className="task-input"
         />
-        <button type="submit" className="add-task-btn">+</button>
+        <button type="submit" className="add-task-btn">
+          +
+        </button>
       </form>
 
       <div className="tasks-list">
-        {tasks.map(task => (
+        {tasks.map((task) => (
           <TodoItem
             key={task.id}
             task={task}
@@ -68,7 +119,7 @@ const TodoSection = ({
         ))}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default TodoSection
+export default TodoSection;
