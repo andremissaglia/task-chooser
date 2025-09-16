@@ -148,7 +148,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>TODO App</h1>
+        <h1>Task Chooser</h1>
         <div className="header-controls">
           <TaskPicker onPick={pickRandomTask} pickedTask={pickedTask} />
           <button className="clear-completed-btn" onClick={clearCompletedTasks}>
