@@ -22,6 +22,12 @@
   font-weight: 600;
 }
 
+.section-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .task-count {
   background: #e2e8f0;
   color: #64748b;
@@ -29,6 +35,26 @@
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+.remove-section-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-section-btn:hover {
+  background-color: #fef2f2;
+  border-color: #fecaca;
 }
 
 .add-task-form {

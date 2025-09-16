@@ -2,27 +2,63 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import TodoSection from "./components/TodoSection";
 import TaskPicker from "./components/TaskPicker";
-
-const SECTIONS = ["Pessoal", "Mercadinho", "BOD", "Insight"];
+import AddSectionForm from "./components/AddSectionForm";
 
 function App() {
+  const [sections, setSections] = useState(() => {
+    const savedSections = localStorage.getItem("todoSections");
+    return savedSections ? JSON.parse(savedSections) : ["Default"];
+  });
+
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("todoTasks");
-    return savedTasks
-      ? JSON.parse(savedTasks)
-      : {
-          Pessoal: [],
-          Mercadinho: [],
-          BOD: [],
-          Insight: [],
-        };
+    if (savedTasks) {
+      return JSON.parse(savedTasks);
+    }
+    // Initialize with default sections
+    const initialTasks = {
+      Default: [],
+    };
+    return initialTasks;
   });
+
   const [pickedTask, setPickedTask] = useState(null);
+
+  // Save sections to localStorage whenever sections change
+  useEffect(() => {
+    localStorage.setItem("todoSections", JSON.stringify(sections));
+  }, [sections]);
 
   // Save tasks to localStorage whenever tasks change
   useEffect(() => {
     localStorage.setItem("todoTasks", JSON.stringify(tasks));
   }, [tasks]);
+
+  const addSection = (sectionName) => {
+    const trimmedName = sectionName.trim();
+    if (trimmedName && !sections.includes(trimmedName)) {
+      setSections((prev) => [...prev, trimmedName]);
+      setTasks((prev) => ({
+        ...prev,
+        [trimmedName]: [],
+      }));
+    }
+  };
+
+  const removeSection = (sectionToRemove) => {
+    setSections((prev) =>
+      prev.filter((section) => section !== sectionToRemove)
+    );
+    setTasks((prev) => {
+      const newTasks = { ...prev };
+      delete newTasks[sectionToRemove];
+      return newTasks;
+    });
+    // Clear picked task if it was from the removed section
+    if (pickedTask && pickedTask.section === sectionToRemove) {
+      setPickedTask(null);
+    }
+  };
 
   const addTask = (section, text) => {
     const newTask = {
@@ -34,7 +70,7 @@ function App() {
 
     setTasks((prev) => ({
       ...prev,
-      [section]: [...prev[section], newTask],
+      [section]: [...(prev[section] || []), newTask],
     }));
   };
 
@@ -66,8 +102,10 @@ function App() {
   const clearCompletedTasks = () => {
     setTasks((prev) => {
       const newTasks = {};
-      for (const section of SECTIONS) {
-        newTasks[section] = prev[section].filter((task) => !task.completed);
+      for (const section of sections) {
+        if (prev[section]) {
+          newTasks[section] = prev[section].filter((task) => !task.completed);
+        }
       }
       return newTasks;
     });
@@ -75,12 +113,14 @@ function App() {
 
   const getAllOpenTasks = () => {
     const openTasks = [];
-    for (const section of SECTIONS) {
-      tasks[section].forEach((task) => {
-        if (!task.completed) {
-          openTasks.push({ ...task, section });
-        }
-      });
+    for (const section of sections) {
+      if (tasks[section]) {
+        tasks[section].forEach((task) => {
+          if (!task.completed) {
+            openTasks.push({ ...task, section });
+          }
+        });
+      }
     }
     return openTasks;
   };
@@ -118,17 +158,21 @@ function App() {
       </header>
 
       <main className="app-main">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <TodoSection
             key={section}
             title={section}
-            tasks={tasks[section]}
+            tasks={tasks[section] || []}
             onAddTask={(text) => addTask(section, text)}
             onToggleTask={(taskId) => toggleTask(section, taskId)}
             onToggleUrgent={(taskId) => toggleUrgent(section, taskId)}
             onRemoveTask={(taskId) => removeTask(section, taskId)}
+            onRemoveSection={() => removeSection(section)}
+            canRemove={sections.length > 1}
           />
         ))}
+
+        <AddSectionForm onAddSection={addSection} />
       </main>
     </div>
   );

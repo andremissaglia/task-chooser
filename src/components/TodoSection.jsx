@@ -8,7 +8,9 @@ const TodoSection = ({
   onAddTask, 
   onToggleTask, 
   onToggleUrgent, 
-  onRemoveTask 
+  onRemoveTask,
+  onRemoveSection,
+  canRemove
 }) => {
   const [newTaskText, setNewTaskText] = useState('')
 
@@ -27,9 +29,20 @@ const TodoSection = ({
     <section className="todo-section">
       <div className="section-header">
         <h2>{title}</h2>
-        <span className="task-count">
-          {completedCount}/{totalCount}
-        </span>
+        <div className="section-header-controls">
+          <span className="task-count">
+            {completedCount}/{totalCount}
+          </span>
+          {canRemove && (
+            <button
+              className="remove-section-btn"
+              onClick={onRemoveSection}
+              title={`Remove ${title} section`}
+            >
+              🗑️
+            </button>
+          )}
+        </div>
       </div>
       
       <form onSubmit={handleSubmit} className="add-task-form">
