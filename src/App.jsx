@@ -145,10 +145,59 @@ function App() {
     setPickedTask(weightedTasks[randomIndex]);
   };
 
+  const getOverallProgress = () => {
+    let totalTasks = 0;
+    let completedTasks = 0;
+
+    for (const section of sections) {
+      if (tasks[section]) {
+        totalTasks += tasks[section].length;
+        completedTasks += tasks[section].filter(
+          (task) => task.completed
+        ).length;
+      }
+    }
+
+    return {
+      total: totalTasks,
+      completed: completedTasks,
+      percentage:
+        totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+    };
+  };
+
+  const progress = getOverallProgress();
+
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Task Chooser</h1>
+        <div className="header-top">
+          <h1>Task Chooser</h1>
+          <div className="progress-section">
+            <div className="progress-info">
+              <span className="progress-text">
+                {progress.completed}/{progress.total} tasks completed (
+                {progress.percentage}%)
+              </span>
+            </div>
+            <div className="progress-bar">
+              <div
+                className={`progress-fill ${
+                  progress.percentage === 100
+                    ? "complete"
+                    : progress.percentage >= 75
+                    ? "high"
+                    : progress.percentage >= 50
+                    ? "medium"
+                    : progress.percentage >= 25
+                    ? "low"
+                    : "minimal"
+                }`}
+                style={{ width: `${progress.percentage}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
         <div className="header-controls">
           <TaskPicker onPick={pickRandomTask} pickedTask={pickedTask} />
           <button className="clear-completed-btn" onClick={clearCompletedTasks}>
